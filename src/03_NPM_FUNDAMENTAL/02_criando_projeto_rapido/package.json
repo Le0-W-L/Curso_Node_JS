@@ -1,0 +1,12 @@
+{
+  "name": "02_criando_projeto_rapido",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Leandro Wendisch",
+  "license": "MIT",
+  "description": "Criando projeto de forma rápida."
+}
