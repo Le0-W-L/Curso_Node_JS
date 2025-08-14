@@ -4,6 +4,7 @@ const Pet = require('../models/Pet')
 //helpers import
 const getToken = require('../helpers/get-token')
 const getUserByToken = require('../helpers/get-user-by-token')
+const ObjectId = require('mongoose').Types.ObjectId
 
 module.exports = class PetController {
     //create pet
@@ -97,5 +98,51 @@ module.exports = class PetController {
         res.status(200).json({
             pets,
         })
+    }
+
+    static async getPetById(req, res) {
+        const id = req.params.id
+
+        if(!ObjectId.isValid(id)){
+            return res.status(422).json({ message: "ID inválido!" })
+        }
+
+        const pet = await Pet.findById(id)
+
+        if(!pet){
+            return res.status(404).json({ message: 'Pet não encontrado!' })
+        }
+
+        res.status(200).json({
+            pet: pet
+        })
+    }
+
+    static async removePetById(req, res) {
+        const id = req.params.id
+
+        //check if id is valid
+        if(!ObjectId.isValid(id)){
+            return res.status(422).json({ message: "ID inválido!" })
+        }
+
+        const pet = await Pet.findById(id)
+
+        //check if pet exists
+        if(!pet){
+            return res.status(404).json({ message: 'Pet não encontrado!' })
+        }
+
+        //check if pet belongs to user
+        const token = getToken(req)
+        const user = await getUserByToken(token)
+
+        if(pet.user._id.toString() !== user._id.toString()){
+            return res.status(422).json({ message: 'Houve um problema na sua solicitação, tente novamente mais tarde!' })
+        }
+
+        await Pet.findByIdAndDelete(id)
+
+        res.status(200).json({ message: "Pet removido com sucesso!" })
     }
 }
